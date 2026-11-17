@@ -1,111 +1,168 @@
-# DS Chat · 可安装的 PWA 站点
+# DS Chat — Installable PWA Deployment
 
-> **[👉 在线打开](https://w32394045-dotcom.github.io/chat-demo/)**
+> **[Open the app →](https://chat.xszx.cc.cd/)**
 >
-> 这是 [`deepseek-ai/chat-demo`](https://github.com/deepseek-ai/chat-demo) 的**静态构建 + PWA 部署**，
-> 非官方，仅供学习 / 自用。上游代码 MIT License，Copyright (c) 2026 DeepSeek。
+> A static build of [`deepseek-ai/chat-demo`](https://github.com/deepseek-ai/chat-demo),
+> deployed as an **installable PWA**. Unofficial; for learning / personal use only.
+> Upstream code is MIT licensed, Copyright (c) 2026 DeepSeek.
+>
+> 中文说明：[`README.zh-CN.md`](README.zh-CN.md)
 
 ---
 
-## 这个仓库到底在解决什么问题
+## Why this repo exists
 
-手机上用 AI 聊天，最烦的是：**开浏览器 → 输网址 / 翻书签 → 再进页面**，每次都这样，用得越顺手越像折磨。
+Chatting with an AI on a phone is painful if every session starts with
+*open a browser → type the URL → find the bookmark → wait for the page*.
 
-所以这个仓库的目标只有一个：
+The single goal of this repo:
 
-> **让这个网页能像 App 一样装到手机上，点桌面图标直接全屏打开，看不到地址栏。**
+> **Make this web app installable on phones and desktops, so users tap one icon
+> and get a full-screen app — no address bar, no browser chrome.**
 
-靠 PWA 的三件事实现：
+That is what a PWA gives us:
 
-| 能力 | 靠什么 | 效果 |
+| Capability | Mechanism | Result |
 |---|---|---|
-| 装到桌面 / 主屏 | `manifest.json` + 图标 | 系统里出现一个「DS Chat」图标，不是书签 |
-| 全屏无浏览器外壳 | `display: standalone` + iOS `apple-mobile-web-app-capable` | 打开就是纯应用界面 |
-| 秒开 / 离线可开外壳 | `sw.js` Service Worker 预缓存 | 弱网先出界面，不用等资源 |
-| 图标正确 | `maskable-512`（Android）/ `apple-touch-icon`（iOS）/ `favicon`（浏览器标签） | 各种位置不糊、不被裁歪 |
+| Icon on home screen / dock | `manifest.json` + icons | A "DS Chat" app icon, not a bookmark |
+| Full-screen, no browser UI | `display: standalone` + iOS `apple-mobile-web-app-capable` | Looks and feels like a native app |
+| Instant start / offline shell | `sw.js` Service Worker pre-cache | Shell renders on weak networks |
+| Correct icons everywhere | `maskable-512` (Android), `apple-touch-icon` (iOS), `favicon` (tabs) | Sharp, not cropped or blurry |
 
-> 注意：**聊天本身需要联网**（调用 DeepSeek API）。离线只保证应用外壳能打开，不是离线聊天。
+> Note: **chatting still requires network access** (DeepSeek API). Offline mode only
+> keeps the app shell open; it is not offline chat.
 
 ---
 
-## 怎么装（移动端）
+## Live URLs
+
+| Host | URL | Notes |
+|---|---|---|
+| Custom domain (primary) | <https://chat.xszx.cc.cd/> | Cloudflare Worker + KV static hosting |
+| Cloudflare workers.dev | <https://chat-demo.w32394045.workers.dev/> | Fallback URL |
+| GitHub Pages | <https://w32394045-dotcom.github.io/chat-demo/> | Mirror of the same build |
+
+All three serve the identical byte-for-byte build.
+
+---
+
+## Install on mobile
 
 ### Android · Chrome / Edge
 
-1. 打开 <https://w32394045-dotcom.github.io/chat-demo/>
-2. 地址栏右侧出现「安装」按钮（或菜单 →「添加到主屏幕」/「安装应用」）
-3. 桌面出现图标 → 点开即全屏，无地址栏
+1. Open <https://chat.xszx.cc.cd/>
+2. Tap the **Install** icon in the address bar (or menu → *Add to Home screen*)
+3. Launch from the home-screen icon — full screen, no address bar
 
-### iOS · Safari（必须 Safari，微信内置浏览器不行）
+### iOS · Safari (Safari only; in-app browsers such as WeChat cannot install)
 
-1. Safari 打开同一网址
-2. 底部「分享」按钮 → 向下找 **「添加到主屏幕」**
-3. 桌面图标 → 打开即全屏（已配 `apple-mobile-web-app-capable` 与 180×180 图标）
+1. Open the same URL in Safari
+2. Tap **Share** → **Add to Home Screen**
+3. Launch from the home-screen icon — full screen (`apple-mobile-web-app-capable`)
 
-### 桌面 · Chrome / Edge
+### Desktop · Chrome / Edge
 
-地址栏右侧「安装」图标 → 装成独立窗口应用，任务栏/程序坞直接启动。
-
----
-
-## 首次使用
-
-安装后仍需在 **设置 → 通用设置** 里填入**你自己的** DeepSeek API Key。
-费用由你自己的 Key 承担，本页面不代持、不上传 Key（存在本地）。
+Address-bar **Install** icon → runs in its own window.
 
 ---
 
-## 本仓库相对上游构建产物的改动
+## First run
 
-上游只提供网页壳，图标是程序画的纯色占位块，且没接 favicon / iOS 图标。本仓库补齐了「能装」的最后一公里：
+After installing, open **Settings → General** and enter **your own** DeepSeek API key.
+Usage is billed to your key; this deployment never sees or stores your key on a server.
 
-| 文件 | 改动 |
+---
+
+## What is different from the upstream build
+
+Upstream ships a web shell with placeholder icons (a solid block) and no favicon or
+iOS icon. This repo fills the missing "installable" pieces:
+
+| File | Change |
 |---|---|
-| `icons/icon-192.png` `icon-512.png` | 换成正式图标（脸部特写，96 色调色板压缩） |
-| `icons/maskable-512.png` | 新增 Android 自适应图标（`purpose: maskable`） |
-| `icons/apple-touch-icon.png` | 新增 iOS 180×180 图标 |
-| `icons/favicon.ico` `favicon-32.png` | 新增浏览器标签页图标（原来是 404） |
-| `index.html` | 补 `favicon` / `apple-touch-icon` / iOS meta；`theme-color` 改为 `#445CA4` |
-| `manifest.json` | 补 `id`、主题色、图标引用 |
-| `sw.js` | 缓存版本 `ds-chat-v1 → ds-chat-v2`，预缓存图标（避免旧 SW 一直吐旧壳） |
-| `static/**` | **未改动**，与上游同一次构建（`main.9820cd3a.js`） |
-| `NOTICE.md` | 归属与非官方声明 |
+| `icons/icon-192.png`, `icon-512.png` | Real app icon (face close-up, 96-colour palette) |
+| `icons/maskable-512.png` | Android adaptive icon (`purpose: maskable`) |
+| `icons/apple-touch-icon.png` | iOS 180×180 icon |
+| `icons/favicon.ico`, `favicon-32.png` | Browser tab icon (previously 404) |
+| `index.html` | Added `favicon`, `apple-touch-icon`, iOS meta; `theme-color` → `#445CA4` |
+| `manifest.json` | Added `id`, theme colour, icon entries |
+| `sw.js` | Cache version `ds-chat-v1 → ds-chat-v2`; icons pre-cached |
+| `static/**` | **Unchanged** — same build as upstream (`main.9820cd3a.js`) |
+| `NOTICE.md` | Attribution and non-official disclaimer |
 
 ---
 
-## 目录结构
+## Layout
 
 ```
 .
-├── index.html            # 入口（含 favicon / iOS meta / SW 注册）
-├── manifest.json         # PWA 清单：名称、图标、standalone、主题色
-├── sw.js                 # Service Worker：预缓存 + 网络优先回退缓存
+├── index.html            # entry: favicon / iOS meta / SW registration
+├── manifest.json         # PWA manifest: name, icons, standalone, theme
+├── sw.js                 # Service Worker: pre-cache + network-first fallback
 ├── icons/                # 192 / 512 / maskable-512 / apple-touch-icon / favicon
-├── static/               # 前端构建产物（js / css / KaTeX 字体），未改动
-├── LICENSE               # 上游 MIT License
-├── NOTICE.md             # 非官方说明与改动清单
-└── .nojekyll             # 关闭 GitHub Pages 的 Jekyll 处理
+├── static/               # front-end build output (JS / CSS / KaTeX fonts), untouched
+├── LICENSE               # upstream MIT license
+├── NOTICE.md             # attribution
+└── .nojekyll             # disable Jekyll on GitHub Pages
 ```
 
 ---
 
-## 部署 / 更新
+## Deployment
 
-由 GitHub Pages 从 `gh-pages` 分支直接托管（不是 fork 里上游的源码分支）。
+### Cloudflare (primary)
 
-上游更新后重新构建，然后执行：
+Hosted as a **Cloudflare Worker** that reads static files from a **Workers KV**
+namespace (`chat-demo-assets`) and serves them with correct MIME types, immutable
+caching for `/static/*`, and SPA fallback to `index.html`.
+
+| Piece | Value |
+|---|---|
+| Worker script | `chat-demo` |
+| KV namespace | `chat-demo-assets` |
+| Custom domain | `chat.xszx.cc.cd` (zone `xszx.cc.cd`) |
+| Cache policy | `/static/*` → 1 year immutable, others → 5 minutes |
+
+Deploy / update:
 
 ```powershell
-python C:\Users\ptfm\Downloads\chat-dist\deploy_ghpages.py
+python cf_workers_deploy.py     # upload all files to KV + deploy the Worker
+python cf_worker_only.py        # only redeploy the Worker code
 ```
 
-脚本会：拉 `gh-pages` → 覆盖站点文件 → 提交 → 推送，Pages 约 20 秒后自动重建。
+> Note: Cloudflare **Pages** direct upload was attempted first and rejected by the
+> platform — every deployment, including a one-file test project, returned HTTP 500
+> from the edge. Workers + KV was used instead; it is the same static content and
+> supports custom domains and PWAs identically.
+
+### GitHub Pages (mirror)
+
+Served from the `gh-pages` branch of this fork:
+
+```powershell
+python deploy_ghpages_v2.py
+```
 
 ---
 
-## 许可与归属
+## Verification
 
-- 代码：[deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo)，MIT License，Copyright (c) 2026 DeepSeek
-- 商标：DeepSeek 及相关标识归其所有者，本仓库不主张任何商标权利
-- 图标插画素材：权利归原作者，此处仅作演示用途
-- 本仓库为非官方部署，与 DeepSeek 官方无隶属关系；详细改动见 [`NOTICE.md`](NOTICE.md)
+The deployment is verified automatically, not assumed:
+
+- All three hosts return HTTP 200 for the shell, manifest, Service Worker, icons and bundles
+- Every fetched file is compared **SHA-256** against the local build (`ALL MATCH`)
+- Installability checks pass: HTTPS, manifest (`name`, `short_name`, `start_url`,
+  `display: standalone`), 192 & 512 icons, `maskable` icon, `apple-touch-icon` 180×180,
+  Service Worker with a `fetch` handler
+- Android circular-crop preview confirms the face icon survives the mask
+
+---
+
+## License and attribution
+
+- Code: [deepseek-ai/chat-demo](https://github.com/deepseek-ai/chat-demo), MIT License,
+  Copyright (c) 2026 DeepSeek
+- Trademark: "DeepSeek" and related marks belong to their owners; no trademark rights claimed
+- Icon artwork: rights belong to the original illustrator; used here for demonstration only
+- This is an **unofficial** deployment with no affiliation or endorsement by DeepSeek.
+  Details: [`NOTICE.md`](NOTICE.md)
