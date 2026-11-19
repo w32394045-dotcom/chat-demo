@@ -1,4 +1,4 @@
-const CACHE = 'ds-chat-v2';
+const CACHE = 'ds-chat-v3';
 
 const PRECACHE = [
   './',
