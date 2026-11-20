@@ -14,7 +14,7 @@
 Chatting with an AI on a phone should not start with *open browser → type URL → find bookmark*.
 Install it like an app: one icon, full screen, no browser chrome.
 
-## What this build adds (v0.3.4)
+## What this build adds (v0.3.5)
 
 - **Two modes** — *Simple* keeps the original UI; *Geek* unlocks generation parameters,
   reasoning effort, safety level, stats and shortcuts.
@@ -77,6 +77,7 @@ cache-first for speed. The version currently running is printed at the bottom of
 | Version | Highlights |
 |---|---|
 | 0.3.4 | Official-style thinking card, mobile scroll fixes, mobile settings layout, network-first SW navigations, version label |
+| 0.3.5 | Legacy-browser compat (Win7 / Chrome 80–109): polyfills for Array.prototype.at, 	oReversed/	oSorted, Object.hasOwn, AbortSignal.throwIfAborted; render error boundary; mobile settings rows stack vertically |
 | 0.3.3 | Unversioned IndexedDB open + 8 s timeout + auto fresh-DB fallback (fixes the “blocked by another tab” deadlock) |
 | 0.3.2 | Usage statistics / quotas, per-chat settings, edit sheet, context compression |
 | 0.3.0 | Simple / Geek modes, deepseek-flash & deepseek-v4-pro models, PWA packaging |
